@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobTrack | Application Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>JobTrack</h1>
+        <p>Your Personal Job Application Tracker</p>
+    </header>
+
+    <main>
+        <h2>Dashboard</h2>
+
+        <section class="stats">
+            <div class="card">Total Applications <h2 id="total">0</h2></div>
+            <div class="card">Interviews <h2 id="interviews">0</h2></div>
+            <div class="card">Selected <h2 id="selected">0</h2></div>
+        </section>
+
+        <h2>Add New Application</h2>
+
+        <form id="jobForm">
+            <input id="company" placeholder="Company Name" required>
+            <input id="role" placeholder="Job Role" required>
+
+            <select id="status">
+                <option>Applied</option>
+                <option>Interview</option>
+                <option>Selected</option>
+                <option>Rejected</option>
+            </select>
+
+            <button type="submit">Add Application</button>
+        </form>
+
+        <h2>My Applications</h2>
+        <div id="jobList"></div>
+    </main>
+
+    <script>
+
+
+let jobs = JSON.parse(localStorage.getItem("jobs")) || [];
+
+function updateDashboard() {
+    document.getElementById("total").textContent = jobs.length;
+
+    document.getElementById("interviews").textContent =
+        jobs.filter(job => job.status === "Interview").length;
+
+    document.getElementById("selected").textContent =
+        jobs.filter(job => job.status === "Selected").length;
+
+    const list = document.getElementById("jobList");
+    list.innerHTML = "";
+
+    jobs.forEach((job, index) => {
+        list.innerHTML += `
+            <div class="card">
+                <h3>${job.company}</h3>
+                <p>${job.role}</p>
+                <p>Status: ${job.status}</p>
+                <button onclick="deleteJob(${index})">Delete</button>
+            </div>
+        `;
+    });
+}
+
+document.getElementById("jobForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    jobs.push({
+        company: document.getElementById("company").value,
+        role: document.getElementById("role").value,
+        status: document.getElementById("status").value
+    });
+
+    localStorage.setItem("jobs", JSON.stringify(jobs));
+
+    this.reset();
+    updateDashboard();
+});
+
+function deleteJob(index) {
+    jobs.splice(index, 1);
+    localStorage.setItem("jobs", JSON.stringify(jobs));
+    updateDashboard();
+}
+
+updateDashboard();
+
+ </script>
+
+</body>
+</html>
